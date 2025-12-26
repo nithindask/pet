@@ -1,0 +1,743 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+}
+
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --income-color: #27ae60;
+    --expense-color: #e74c3c;
+    --asset-color: #9b59b6;
+    --liability-color: #e67e22;
+    --profit-color: #2ecc71;
+    --loss-color: #e74c3c;
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --sidebar-bg: #2c3e50;
+    --text-light: #ffffff;
+    --text-dark: #333333;
+    --border-color: #e0e0e0;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background-color: var(--sidebar-bg);
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    padding: 25px 0;
+    box-shadow: var(--shadow);
+    z-index: 10;
+}
+
+a {
+    color: red;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    padding: 0 20px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo i {
+    font-size: 28px;
+    margin-right: 12px;
+    color: var(--secondary-color);
+}
+
+.logo h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 30px 0;
+    flex-grow: 1;
+}
+
+.nav-links li {
+    padding: 15px 25px;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--transition);
+    border-left: 4px solid transparent;
+}
+
+.nav-links li:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-links li.active {
+    background-color: rgba(52, 152, 219, 0.2);
+    border-left-color: var(--secondary-color);
+}
+
+.nav-links li i {
+    font-size: 20px;
+    margin-right: 15px;
+    width: 24px;
+    text-align: center;
+}
+
+.nav-links li span {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.current-date {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.current-date i {
+    margin-right: 10px;
+    color: var(--secondary-color);
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+/* Header Styles */
+header {
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: var(--primary-color);
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+header h1 i {
+    margin-right: 12px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Input Section */
+.input-section {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+}
+
+.input-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: end;
+}
+
+.input-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-box label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+}
+
+.input-box label i {
+    margin-right: 8px;
+    color: var(--secondary-color);
+}
+
+.input-box input,
+.input-box select {
+    padding: 14px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.input-box input:focus,
+.input-box select:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.add-btn {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 50px;
+}
+
+.add-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* Table Section */
+.table-section {
+    margin-bottom: 30px;
+}
+
+.table-container {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+#account-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+#account-table thead {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#account-table th {
+    padding: 18px 15px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#account-table th:last-child {
+    border-right: none;
+}
+
+#account-table th.serial-col {
+    width: 80px;
+}
+
+#account-table th.income-col {
+    background-color: rgba(39, 174, 96, 0.9);
+}
+
+#account-table th.expense-col {
+    background-color: rgba(231, 76, 60, 0.9);
+}
+
+#account-table th.asset-col {
+    background-color: rgba(155, 89, 182, 0.9);
+}
+
+#account-table th.liability-col {
+    background-color: rgba(230, 126, 34, 0.9);
+}
+
+#account-table th.action-col {
+    width: 120px;
+    background-color: rgba(52, 73, 94, 0.9);
+}
+
+#account-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+#account-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+#account-table td {
+    padding: 15px;
+    text-align: center;
+    border-right: 1px solid var(--border-color);
+    height: 60px;
+}
+
+#account-table td:last-child {
+    border-right: none;
+}
+
+.empty-table {
+    text-align: center;
+    padding: 50px !important;
+    color: #999;
+}
+
+.empty-table i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #ddd;
+}
+
+.empty-table p {
+    font-size: 1.2rem;
+}
+
+#account-table tfoot {
+    background-color: #f1f5f9;
+    font-weight: 600;
+}
+
+.totals-row td {
+    padding: 18px 15px;
+    font-size: 1.2rem;
+}
+
+.income-total {
+    color: var(--income-color);
+    font-weight: 700;
+    background-color: rgba(39, 174, 96, 0.1);
+}
+
+.expense-total {
+    color: var(--expense-color);
+    font-weight: 700;
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+.asset-total {
+    color: var(--asset-color);
+    font-weight: 700;
+    background-color: rgba(155, 89, 182, 0.1);
+}
+
+.liability-total {
+    color: var(--liability-color);
+    font-weight: 700;
+    background-color: rgba(230, 126, 34, 0.1);
+}
+
+/* Profit/Loss Section */
+.profit-loss-section {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.profit-display, .loss-display {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px 40px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-width: 250px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: var(--transition);
+}
+
+.profit-display.show, .loss-display.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.profit-display {
+    border-top: 5px solid var(--profit-color);
+}
+
+.loss-display {
+    border-top: 5px solid var(--loss-color);
+}
+
+.profit-display i {
+    font-size: 2.5rem;
+    color: var(--profit-color);
+}
+
+.loss-display i {
+    font-size: 2.5rem;
+    color: var(--loss-color);
+}
+
+.profit-display h3, .loss-display h3 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 1.3rem;
+}
+
+.profit-display .amount {
+    color: var(--profit-color);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.loss-display .amount {
+    color: var(--loss-color);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Delete Button */
+.delete-btn {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.delete-btn:hover {
+    background-color: #fecaca;
+    transform: scale(1.05);
+}
+
+/* Save Status */
+.save-status {
+    text-align: center;
+    padding: 15px;
+    color: #666;
+}
+
+.save-status i {
+    color: var(--secondary-color);
+    margin-right: 8px;
+}
+
+/* History Page */
+.history-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 25px;
+}
+
+.clear-btn {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clear-btn:hover {
+    background-color: #fecaca;
+}
+
+#history-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.history-item {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: var(--transition);
+    border-left: 5px solid var(--secondary-color);
+}
+
+.history-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.history-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.history-date {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.history-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.summary-value {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.income-summary {
+    color: var(--income-color);
+}
+
+.expense-summary {
+    color: var(--expense-color);
+}
+
+.empty-history {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.empty-history i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+.empty-history h3 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #666;
+}
+
+/* History Detail */
+.history-detail {
+    display: none;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 0;
+    margin-top: 30px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.history-detail.active {
+    display: block;
+}
+
+.history-detail-header {
+    background-color: #f1f5f9;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.history-detail-header h3 {
+    color: var(--primary-color);
+}
+
+.close-btn {
+    background-color: #e5e7eb;
+    color: #4b5563;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: var(--transition);
+}
+
+.close-btn:hover {
+    background-color: #d1d5db;
+}
+
+#history-detail-content {
+    padding: 20px;
+}
+
+.history-table-container {
+    overflow-x: auto;
+}
+
+.history-table-wrapper {
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.history-table-wrapper h4 {
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+}
+
+.history-table-wrapper h4 i {
+    margin-right: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .profit-loss-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .profit-display, .loss-display {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 992px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        padding: 15px 0;
+    }
+    
+    .logo {
+        padding: 0 15px 15px;
+    }
+    
+    .nav-links {
+        display: flex;
+        padding: 15px 0;
+    }
+    
+    .nav-links li {
+        flex: 1;
+        justify-content: center;
+        border-left: none;
+        border-bottom: 4px solid transparent;
+        margin: 0 5px;
+    }
+    
+    .nav-links li.active {
+        border-left: none;
+        border-bottom-color: var(--secondary-color);
+    }
+    
+    .current-date {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 20px;
+    }
+    
+    .input-group {
+        grid-template-columns: 1fr;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .history-item {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 576px) {
+    .profit-loss-section {
+        gap: 15px;
+    }
+    
+    .profit-display, .loss-display {
+        padding: 20px;
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .profit-display .amount, .loss-display .amount {
+        font-size: 1.8rem;
+    }
+    
+    #account-table th {
+        padding: 12px 8px;
+        font-size: 1rem;
+    }
+    
+    #account-table td {
+        padding: 12px 8px;
+    }
+}

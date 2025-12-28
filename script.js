@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Total displays
     const totalIncomeDisplay = document.getElementById('total-income');
     const totalExpenseDisplay = document.getElementById('total-expense');
-    const totalAssetDisplay = document.getElementById('total-asset');
-    const totalLiabilityDisplay = document.getElementById('total-liability');
     
     // Profit/Loss displays
     const profitDisplay = document.getElementById('profit-display');
@@ -35,34 +33,57 @@ document.addEventListener('DOMContentLoaded', function() {
     // Date display
     const todayDate = document.getElementById('today-date');
     
-    // Current day's data - organized by rows
+    // Current day's data - simplified structure
     let currentData = {
-        rows: [], // Each row: { id, income, expense, asset, liability }
-        rowCount: 0
+        rows: [], // Each row: { id, income: {id, amount}, expense: {id, amount} }
+        nextId: 1
     };
     
-    // Initialize the application
     function init() {
-        // Set today's date
-        const today = new Date();
-        const formattedDate = formatDate(today);
-        todayDate.textContent = formattedDate;
-        
-        // Check and handle daily reset
-        checkDailyReset();
-        
-        // Load today's data
-        loadTodayData();
-        
-        // Update all displays
-        updateTotals();
-        updateProfitLoss();
-        
-        // Load history
-        loadHistory();
-        
-        // Set up event listeners
-        setupEventListeners();
+    // Set today's date
+    const today = new Date();
+    const formattedDate = formatDate(today);
+    todayDate.textContent = formattedDate;
+    
+    // Check and handle daily reset
+    checkDailyReset();
+    
+    // Load today's data
+    loadTodayData();
+    
+    // Debug: Check if total elements exist
+    console.log('Total Income Display:', totalIncomeDisplay);
+    console.log('Total Expense Display:', totalExpenseDisplay);
+    console.log('Element IDs:', totalIncomeDisplay.id, totalExpenseDisplay.id);
+    
+    // Update all displays
+    updateTotals();
+    updateProfitLoss();
+    
+    // Load history
+    loadHistory();
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Enhance glass effects
+    enhanceGlassEffects();
+}
+    
+    // Enhance glass effects with animations
+    function enhanceGlassEffects() {
+        setTimeout(() => {
+            document.querySelectorAll('.sidebar, header, .input-section, .table-container').forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+        });
+        }, 100);
     }
     
     // Set up all event listeners
@@ -116,14 +137,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${year}-${month}-${day}`;
     }
     
-    // Format time as HH:MM:SS
-    function formatTime(date) {
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-        return `${hours}:${minutes}:${seconds}`;
-    }
-    
     // Check if we need to reset for a new day
     function checkDailyReset() {
         const today = new Date();
@@ -138,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Clear current data for new day
             currentData = {
                 rows: [],
-                rowCount: 0
+                nextId: 1
             };
             
             // Clear table
@@ -164,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentData.rows.length > 0) {
             const dayData = {
                 date: dateKey,
-                data: { ...currentData },
+                data: JSON.parse(JSON.stringify(currentData)), // Deep clone
                 totals: calculateTotals(),
                 profitLoss: calculateProfitLoss()
             };
@@ -189,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const history = JSON.parse(localStorage.getItem('expenseHistory') || '{}');
         
         if (history[todayKey]) {
-            currentData = { ...history[todayKey].data };
+            currentData = JSON.parse(JSON.stringify(history[todayKey].data));
             renderTable();
         }
     }
@@ -201,38 +214,48 @@ document.addEventListener('DOMContentLoaded', function() {
         const type = typeSelect.value;
         
         // Validate amount
-        if (!amount || amount <= 0) {
+        if (!amount || amount <= 0 || isNaN(amount)) {
             alert('Please enter a valid amount greater than 0');
             amountInput.focus();
             return;
         }
         
-        // Create new row if needed
-        if (currentData.rows.length === 0) {
-            createNewRow();
-        }
-        
-        // Get the last row
-        const lastRowIndex = currentData.rows.length - 1;
-        const lastRow = currentData.rows[lastRowIndex];
-        
-        // Check if the column in the last row is already filled
-        if (lastRow[type] !== null) {
-            // Create a new row
-            createNewRow();
-        }
-        
-        // Update the last row with the new entry
-        const updatedLastRowIndex = currentData.rows.length - 1;
-        const updatedLastRow = currentData.rows[updatedLastRowIndex];
-        updatedLastRow[type] = {
-            id: Date.now(),
+        // Create entry object
+        const entryId = currentData.nextId++;
+        const entry = {
+            id: entryId,
             amount: amount,
-            timestamp: new Date().getTime()
+            timestamp: Date.now()
         };
         
+        // Find a row to place this entry
+        let placed = false;
+        
+        // First, try to find a row where this column is empty
+        for (let i = 0; i < currentData.rows.length; i++) {
+            if (type === 'income' && !currentData.rows[i].income) {
+                currentData.rows[i].income = entry;
+                placed = true;
+                break;
+            } else if (type === 'expense' && !currentData.rows[i].expense) {
+                currentData.rows[i].expense = entry;
+                placed = true;
+                break;
+            }
+        }
+        
+        // If no suitable row found, create a new row
+        if (!placed) {
+            const newRow = {
+                id: currentData.nextId++,
+                income: type === 'income' ? entry : null,
+                expense: type === 'expense' ? entry : null
+            };
+            currentData.rows.push(newRow);
+        }
+        
         // Update the table
-        updateRowInTable(updatedLastRowIndex, updatedLastRow);
+        renderTable();
         
         // Update totals
         updateTotals();
@@ -246,161 +269,38 @@ document.addEventListener('DOMContentLoaded', function() {
         autoSave();
     }
     
-    // Create a new empty row
-    function createNewRow() {
-        currentData.rowCount++;
-        const newRow = {
-            id: Date.now() + currentData.rowCount,
-            income: null,
-            expense: null,
-            asset: null,
-            liability: null
-        };
-        currentData.rows.push(newRow);
-        
-        // Add row to table
-        addRowToTable(newRow, currentData.rows.length - 1);
-    }
-    
-    // Add a row to the table
-    function addRowToTable(row, index) {
-        // Remove empty row message if it exists
-        if (emptyRow && emptyRow.parentNode) {
-            emptyRow.remove();
-        }
-        
-        // Create new row element
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-row-id', row.id);
-        
-        // Serial number cell
-        const serialCell = document.createElement('td');
-        serialCell.textContent = index + 1;
-        
-        // Income cell
-        const incomeCell = document.createElement('td');
-        if (row.income) {
-            incomeCell.textContent = `₹${row.income.amount.toFixed(2)}`;
-            incomeCell.style.backgroundColor = 'rgba(39, 174, 96, 0.1)';
-        }
-        
-        // Expense cell
-        const expenseCell = document.createElement('td');
-        if (row.expense) {
-            expenseCell.textContent = `₹${row.expense.amount.toFixed(2)}`;
-            expenseCell.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
-        }
-        
-        // Asset cell
-        const assetCell = document.createElement('td');
-        if (row.asset) {
-            assetCell.textContent = `₹${row.asset.amount.toFixed(2)}`;
-            assetCell.style.backgroundColor = 'rgba(155, 89, 182, 0.1)';
-        }
-        
-        // Liability cell
-        const liabilityCell = document.createElement('td');
-        if (row.liability) {
-            liabilityCell.textContent = `₹${row.liability.amount.toFixed(2)}`;
-            liabilityCell.style.backgroundColor = 'rgba(230, 126, 34, 0.1)';
-        }
-        
-        // Action cell
-        const actionCell = document.createElement('td');
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'delete-btn';
-        deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
-        deleteButton.onclick = () => deleteRow(row.id);
-        actionCell.appendChild(deleteButton);
-        
-        // Append all cells
-        tr.appendChild(serialCell);
-        tr.appendChild(incomeCell);
-        tr.appendChild(expenseCell);
-        tr.appendChild(assetCell);
-        tr.appendChild(liabilityCell);
-        tr.appendChild(actionCell);
-        
-        // Add to table
-        tableBody.appendChild(tr);
-    }
-    
-    // Update a row in the table
-    function updateRowInTable(index, row) {
-        const rowElement = tableBody.querySelector(`tr[data-row-id="${row.id}"]`);
-        
-        if (rowElement) {
-            const cells = rowElement.cells;
+    // Delete an entry from a specific cell
+    function deleteEntry(rowIndex, type) {
+        if (rowIndex >= 0 && rowIndex < currentData.rows.length) {
+            const row = currentData.rows[rowIndex];
             
-            // Update serial number
-            cells[0].textContent = index + 1;
-            
-            // Update income cell
-            if (row.income) {
-                cells[1].textContent = `₹${row.income.amount.toFixed(2)}`;
-                cells[1].style.backgroundColor = 'rgba(39, 174, 96, 0.1)';
-            } else {
-                cells[1].textContent = '';
-                cells[1].style.backgroundColor = '';
+            if (type === 'income' && row.income) {
+                row.income = null;
+            } else if (type === 'expense' && row.expense) {
+                row.expense = null;
             }
             
-            // Update expense cell
-            if (row.expense) {
-                cells[2].textContent = `₹${row.expense.amount.toFixed(2)}`;
-                cells[2].style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
-            } else {
-                cells[2].textContent = '';
-                cells[2].style.backgroundColor = '';
+            // Check if row is now completely empty
+            if (!row.income && !row.expense) {
+                // Remove the empty row
+                currentData.rows.splice(rowIndex, 1);
             }
             
-            // Update asset cell
-            if (row.asset) {
-                cells[3].textContent = `₹${row.asset.amount.toFixed(2)}`;
-                cells[3].style.backgroundColor = 'rgba(155, 89, 182, 0.1)';
-            } else {
-                cells[3].textContent = '';
-                cells[3].style.backgroundColor = '';
+            // Update the table
+            renderTable();
+            
+            // Update totals
+            updateTotals();
+            updateProfitLoss();
+            
+            // Show empty message if no entries
+            if (currentData.rows.length === 0) {
+                showEmptyTableMessage();
             }
             
-            // Update liability cell
-            if (row.liability) {
-                cells[4].textContent = `₹${row.liability.amount.toFixed(2)}`;
-                cells[4].style.backgroundColor = 'rgba(230, 126, 34, 0.1)';
-            } else {
-                cells[4].textContent = '';
-                cells[4].style.backgroundColor = '';
-            }
+            // Auto-save
+            autoSave();
         }
-    }
-    
-    // Delete a row
-    function deleteRow(rowId) {
-        // Remove from data array
-        const rowIndex = currentData.rows.findIndex(row => row.id === rowId);
-        if (rowIndex !== -1) {
-            currentData.rows.splice(rowIndex, 1);
-        }
-        
-        // Remove from table
-        const rowElement = tableBody.querySelector(`tr[data-row-id="${rowId}"]`);
-        if (rowElement) {
-            rowElement.remove();
-        }
-        
-        // Re-render table with updated serial numbers
-        renderTable();
-        
-        // Update totals
-        updateTotals();
-        updateProfitLoss();
-        
-        // Show empty message if no rows
-        if (currentData.rows.length === 0) {
-            showEmptyTableMessage();
-        }
-        
-        // Auto-save
-        autoSave();
     }
     
     // Render the entire table
@@ -408,9 +308,61 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear table body
         tableBody.innerHTML = '';
         
+        // Remove empty row message if it exists
+        if (emptyRow && emptyRow.parentNode) {
+            emptyRow.remove();
+        }
+        
         // Add all rows
         currentData.rows.forEach((row, index) => {
-            addRowToTable(row, index);
+            const tr = document.createElement('tr');
+            
+            // Income cell (first column)
+            const incomeCell = document.createElement('td');
+            if (row.income) {
+                const cellContent = document.createElement('div');
+                cellContent.className = 'cell-content';
+                cellContent.textContent = `₹${row.income.amount.toFixed(2)}`;
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'cell-delete-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+                deleteBtn.title = 'Delete this income entry';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteEntry(index, 'income');
+                };
+                
+                incomeCell.appendChild(cellContent);
+                incomeCell.appendChild(deleteBtn);
+            }
+            
+            // Expense cell (second column)
+            const expenseCell = document.createElement('td');
+            if (row.expense) {
+                const cellContent = document.createElement('div');
+                cellContent.className = 'cell-content';
+                cellContent.textContent = `₹${row.expense.amount.toFixed(2)}`;
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'cell-delete-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+                deleteBtn.title = 'Delete this expense entry';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteEntry(index, 'expense');
+                };
+                
+                expenseCell.appendChild(cellContent);
+                expenseCell.appendChild(deleteBtn);
+            }
+            
+            // Append cells to row
+            tr.appendChild(incomeCell);
+            tr.appendChild(expenseCell);
+            
+            // Add row to table
+            tableBody.appendChild(tr);
         });
         
         // Show empty message if no data
@@ -429,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearTable() {
         currentData = {
             rows: [],
-            rowCount: 0
+            nextId: 1
         };
         showEmptyTableMessage();
     }
@@ -438,21 +390,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function calculateTotals() {
         let incomeTotal = 0;
         let expenseTotal = 0;
-        let assetTotal = 0;
-        let liabilityTotal = 0;
         
         currentData.rows.forEach(row => {
-            if (row.income) incomeTotal += row.income.amount;
-            if (row.expense) expenseTotal += row.expense.amount;
-            if (row.asset) assetTotal += row.asset.amount;
-            if (row.liability) liabilityTotal += row.liability.amount;
+            if (row.income) {
+                incomeTotal += row.income.amount;
+            }
+            if (row.expense) {
+                expenseTotal += row.expense.amount;
+            }
         });
         
         return {
             income: incomeTotal,
-            expense: expenseTotal,
-            asset: assetTotal,
-            liability: liabilityTotal
+            expense: expenseTotal
         };
     }
     
@@ -463,15 +413,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Update total displays
-    function updateTotals() {
-        const totals = calculateTotals();
-        
-        totalIncomeDisplay.textContent = `₹${totals.income.toFixed(2)}`;
-        totalExpenseDisplay.textContent = `₹${totals.expense.toFixed(2)}`;
-        totalAssetDisplay.textContent = `₹${totals.asset.toFixed(2)}`;
-        totalLiabilityDisplay.textContent = `₹${totals.liability.toFixed(2)}`;
-    }
+function updateTotals() {
+    const totals = calculateTotals();
     
+    console.log('Calculated totals:', totals);
+    console.log('Updating income total to:', `₹${totals.income.toFixed(2)}`);
+    console.log('Updating expense total to:', `₹${totals.expense.toFixed(2)}`);
+    
+    totalIncomeDisplay.textContent = `₹${totals.income.toFixed(2)}`;
+    totalExpenseDisplay.textContent = `₹${totals.expense.toFixed(2)}`;
+    
+    // Debug: Check if text was set
+    console.log('Income display now contains:', totalIncomeDisplay.textContent);
+    console.log('Expense display now contains:', totalExpenseDisplay.textContent);
+}
     // Update profit/loss display
     function updateProfitLoss() {
         const profitLoss = calculateProfitLoss();
@@ -504,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const originalText = saveMessage.innerHTML;
         
         saveMessage.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-        saveMessage.style.color = 'var(--income-color)';
+        saveMessage.style.color = 'var(--accent-green)';
         
         // Reset after 3 seconds
         setTimeout(() => {
@@ -599,11 +554,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const thead = document.createElement('thead');
         thead.innerHTML = `
             <tr>
-                <th>#</th>
                 <th>Income (INR)</th>
                 <th>Expense (INR)</th>
-                <th>Asset (INR)</th>
-                <th>Liability (INR)</th>
             </tr>
         `;
         
@@ -611,33 +563,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const tbody = document.createElement('tbody');
         
         if (dayData.data.rows && dayData.data.rows.length > 0) {
-            dayData.data.rows.forEach((row, index) => {
+            dayData.data.rows.forEach((row) => {
                 const tr = document.createElement('tr');
-                
-                const serialCell = document.createElement('td');
-                serialCell.textContent = index + 1;
                 
                 const incomeCell = document.createElement('td');
                 incomeCell.textContent = row.income ? `₹${row.income.amount.toFixed(2)}` : '';
-                if (row.income) incomeCell.style.backgroundColor = 'rgba(39, 174, 96, 0.1)';
+                if (row.income) incomeCell.style.backgroundColor = 'rgba(48, 209, 88, 0.1)';
                 
                 const expenseCell = document.createElement('td');
                 expenseCell.textContent = row.expense ? `₹${row.expense.amount.toFixed(2)}` : '';
-                if (row.expense) expenseCell.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
+                if (row.expense) expenseCell.style.backgroundColor = 'rgba(255, 69, 58, 0.1)';
                 
-                const assetCell = document.createElement('td');
-                assetCell.textContent = row.asset ? `₹${row.asset.amount.toFixed(2)}` : '';
-                if (row.asset) assetCell.style.backgroundColor = 'rgba(155, 89, 182, 0.1)';
-                
-                const liabilityCell = document.createElement('td');
-                liabilityCell.textContent = row.liability ? `₹${row.liability.amount.toFixed(2)}` : '';
-                if (row.liability) liabilityCell.style.backgroundColor = 'rgba(230, 126, 34, 0.1)';
-                
-                tr.appendChild(serialCell);
                 tr.appendChild(incomeCell);
                 tr.appendChild(expenseCell);
-                tr.appendChild(assetCell);
-                tr.appendChild(liabilityCell);
                 
                 tbody.appendChild(tr);
             });
@@ -646,11 +584,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const tfoot = document.createElement('tfoot');
             tfoot.innerHTML = `
                 <tr class="totals-row">
-                    <td><strong>Totals</strong></td>
                     <td><strong>₹${dayData.totals.income.toFixed(2)}</strong></td>
                     <td><strong>₹${dayData.totals.expense.toFixed(2)}</strong></td>
-                    <td><strong>₹${dayData.totals.asset.toFixed(2)}</strong></td>
-                    <td><strong>₹${dayData.totals.liability.toFixed(2)}</strong></td>
                 </tr>
             `;
             

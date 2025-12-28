@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P.E.T. | Personal Expense Tracker</title>
+    <meta name="description" content="Premium Personal Expense Tracker">
+    
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -15,7 +17,7 @@
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="logo">
-                <i class="fas fa-calculator"></i>
+                <i class="fas fa-chart-line"></i>
                 <h2>P.E.T.</h2>
             </div>
             <ul class="nav-links">
@@ -38,10 +40,6 @@
         <main class="main-content">
             <!-- Home Page -->
             <div id="home-page" class="page active">
-                <header>
-                    <h1>₹ Personal Expense Tracker</h1>
-                    <p class="subtitle">Accountant-style financial records</p>
-                </header>
 
                 <!-- Input Section -->
                 <section class="input-section">
@@ -55,8 +53,6 @@
                             <select id="type">
                                 <option value="income">Income</option>
                                 <option value="expense">Expense</option>
-                                <option value="asset">Asset</option>
-                                <option value="liability">Liability</option>
                             </select>
                         </div>
                         <button id="add-btn" class="add-btn">
@@ -68,38 +64,28 @@
                 <!-- Main Account Table -->
                 <section class="table-section">
                     <div class="table-container">
-                        <div class="table-scroll">
-                            <table id="account-table">
-                                <thead>
-                                    <tr>
-                                        <th class="serial-col">#</th>
-                                        <th class="income-col">Income (INR)</th>
-                                        <th class="expense-col">Expense (INR)</th>
-                                        <th class="asset-col">Asset (INR)</th>
-                                        <th class="liability-col">Liability (INR)</th>
-                                        <th class="action-col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-body">
-                                    <!-- Rows will be added by JavaScript -->
-                                    <tr id="empty-row">
-                                        <td colspan="6" class="empty-table">
-                                            <i class="fas fa-clipboard-list"></i>
-                                            <p>No entries yet. Add your first transaction above.</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr class="totals-row">
-                                        <td><strong>Totals</strong></td>
-                                        <td id="total-income" class="income-total">₹0.00</td>
-                                        <td id="total-expense" class="expense-total">₹0.00</td>
-                                        <td id="total-asset" class="asset-total">₹0.00</td>
-                                        <td id="total-liability" class="liability-total">₹0.00</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                        <table id="account-table">
+                            <thead>
+                                <tr>
+                                    <th class="income-col">Income (INR)</th>
+                                    <th class="expense-col">Expense (INR)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Entries will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Totals Row (Separate from table) -->
+                    <div class="totals-container">
+                        <div class="total-box income-total">
+                            <span class="total-label">Total Income:</span>
+                            <span class="total-amount" id="total-income">₹0.00</span>
+                        </div>
+                        <div class="total-box expense-total">
+                            <span class="total-label">Total Expense:</span>
+                            <span class="total-amount" id="total-expense">₹0.00</span>
                         </div>
                     </div>
 
@@ -121,11 +107,6 @@
                         </div>
                     </div>
                 </section>
-
-                <!-- Save Status -->
-                <div class="save-status">
-                    <p id="save-message"><i class="fas fa-save"></i> All data is automatically saved locally<br>Made by <a href="https://nithindas.netlify.app">nithin das</a></p>
-                </div>
             </div>
 
             <!-- History Page -->
@@ -142,25 +123,7 @@
                 </div>
 
                 <div id="history-list">
-                    <!-- History items will be added by JavaScript -->
-                    <div class="empty-history">
-                        <i class="fas fa-inbox"></i>
-                        <h3>No history yet</h3>
-                        <p>Your daily records will appear here after each day</p>
-                    </div>
-                </div>
-
-                <!-- History Detail View -->
-                <div id="history-detail" class="history-detail">
-                    <div class="history-detail-header">
-                        <h3 id="detail-date">Select a date to view details</h3>
-                        <button id="close-detail" class="close-btn">
-                            <i class="fas fa-times"></i> Close
-                        </button>
-                    </div>
-                    <div id="history-detail-content">
-                        <!-- Detail tables will be loaded here -->
-                    </div>
+                    <!-- History items will be added here -->
                 </div>
             </div>
         </main>
@@ -168,5 +131,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>
